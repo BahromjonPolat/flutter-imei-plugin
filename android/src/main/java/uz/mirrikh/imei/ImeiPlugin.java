@@ -1,4 +1,4 @@
-package com.example.imei;
+package uz.mirrikh.imei;
 
 import androidx.annotation.NonNull;
 

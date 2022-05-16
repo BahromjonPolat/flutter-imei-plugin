@@ -4,7 +4,7 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:imei/imei.dart';
 
-void main() {
+void main() async{
   runApp(const MyApp());
 }
 
@@ -16,7 +16,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-
   @override
   void initState() {
     super.initState();
@@ -27,7 +26,7 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(title: const Text('Plugin example app')),
-        body: const Center(child: Text('Running on: ')),
+        body: Center(child: Text(Imei.platformVersion.toString())),
       ),
     );
   }
