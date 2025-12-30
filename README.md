@@ -1,39 +1,133 @@
-<!-- 
-This README describes the package. If you publish this package to pub.dev,
-this README's contents appear on the landing page for your package.
+# IMEI Plugin
 
-For information about how to write a good package README, see the guide for
-[writing package pages](https://dart.dev/guides/libraries/writing-package-pages). 
+A Flutter plugin to retrieve IMEI (International Mobile Equipment Identity) numbers from Android devices.
 
-For general information about developing packages, see the Dart guide for
-[creating packages](https://dart.dev/guides/libraries/create-library-packages)
-and the Flutter guide for
-[developing packages and plugins](https://flutter.dev/developing-packages). 
--->
+## Platform Support
 
-TODO: Put a short description of the package here that helps potential users
-know whether this package might be useful for them.
+| Platform | Supported | Notes |
+|----------|-----------|-------|
+| Android  | Yes       | Requires READ_PHONE_STATE permission |
+| iOS      | No        | Apple removed IMEI access for privacy reasons |
 
 ## Features
 
-TODO: List what your package can do. Maybe include images, gifs, or videos.
+- Get single IMEI number
+- Get multiple IMEI numbers (for dual SIM devices)
+- Supports Android API 21+
+- Modern null-safety support
 
-## Getting started
+## Installation
 
-TODO: List prerequisites and provide or point to information on how to
-start using the package.
+Add this to your package's `pubspec.yaml` file:
+
+```yaml
+dependencies:
+  imei: ^0.0.1
+```
+
+Then run:
+
+```bash
+flutter pub get
+```
+
+## Android Setup
+
+Add the following permission to your `AndroidManifest.xml`:
+
+```xml
+<uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+```
+
+### Runtime Permission
+
+For Android 6.0 (API level 23) and above, you need to request the permission at runtime. You can use the [permission_handler](https://pub.dev/packages/permission_handler) package:
+
+```dart
+import 'package:permission_handler/permission_handler.dart';
+
+Future<void> requestPhonePermission() async {
+  final status = await Permission.phone.request();
+  if (status.isGranted) {
+    // Permission granted
+  } else {
+    // Permission denied
+  }
+}
+```
 
 ## Usage
 
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder. 
+### Get Single IMEI
 
 ```dart
-const like = 'sample';
+import 'package:imei/imei.dart';
+
+try {
+  String? imei = await Imei.getImei();
+  if (imei != null) {
+    print('IMEI: $imei');
+  } else {
+    print('IMEI not available or permission denied');
+  }
+} catch (e) {
+  print('Error: $e');
+}
 ```
 
-## Additional information
+### Get Multiple IMEIs (Dual SIM)
 
-TODO: Tell users more about the package: where to find more information, how to 
-contribute to the package, how to file issues, what response they can expect 
-from the package authors, and more.
+```dart
+import 'package:imei/imei.dart';
+
+try {
+  List<String> imeiList = await Imei.getImeiList();
+  if (imeiList.isNotEmpty) {
+    for (int i = 0; i < imeiList.length; i++) {
+      print('IMEI ${i + 1}: ${imeiList[i]}');
+    }
+  } else {
+    print('No IMEI numbers available or permission denied');
+  }
+} catch (e) {
+  print('Error: $e');
+}
+```
+
+## Example App
+
+See the [example](example/) directory for a complete sample app demonstrating how to use this plugin.
+
+## Important Notes
+
+### iOS Support
+iOS does not support IMEI retrieval. Apple removed access to device identifiers like IMEI and UDID for privacy reasons. On iOS:
+- `getImei()` will throw a PlatformException
+- `getImeiList()` will return an empty list
+
+If you need to identify iOS devices, consider using:
+- `identifierForVendor` (changes when app is reinstalled)
+- Device check API for fraud prevention
+
+### Android API Versions
+- **API 26+**: Uses `TelephonyManager.getImei()` and `TelephonyManager.getMeid()`
+- **API 21-25**: Uses deprecated `TelephonyManager.getDeviceId()`
+
+### Privacy Considerations
+IMEI is a sensitive device identifier. Make sure to:
+- Clearly explain why you need this permission in your app
+- Handle the data securely
+- Comply with privacy regulations (GDPR, etc.)
+- Only request when necessary
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Author
+
+Bahromjon Polat - [GitHub](https://github.com/BahromjonPolat)
