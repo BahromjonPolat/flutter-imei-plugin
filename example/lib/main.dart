@@ -53,12 +53,14 @@ class _MyHomePageState extends State<MyHomePage> {
     });
 
     try {
-      final imei = await Imei.getImei();
+      final imei = await Imei.getIMEI();
+      print(imei);
       setState(() {
         _imei = imei ?? 'IMEI not available';
         _isLoading = false;
       });
     } catch (e) {
+      print('Error: $e');
       setState(() {
         _imei = 'Error';
         _errorMessage = e.toString();
@@ -80,6 +82,7 @@ class _MyHomePageState extends State<MyHomePage> {
         _isLoading = false;
       });
     } catch (e) {
+      print(e);
       setState(() {
         _imeiList = [];
         _errorMessage = e.toString();

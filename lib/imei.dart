@@ -12,7 +12,7 @@ class Imei {
   /// Requires READ_PHONE_STATE permission on Android.
   ///
   /// Returns null if permission is not granted or IMEI is not available.
-  static Future<String?> getImei() async {
+  static Future<String?> getIMEI() async {
     try {
       final String? imei = await _channel.invokeMethod('getImei');
       return imei;
@@ -30,7 +30,8 @@ class Imei {
   /// Returns empty list if permission is not granted.
   static Future<List<String>> getImeiList() async {
     try {
-      final List<dynamic>? imeiList = await _channel.invokeMethod('getImeiList');
+      final List<dynamic>? imeiList =
+          await _channel.invokeMethod('getImeiList');
       return imeiList?.cast<String>() ?? [];
     } on PlatformException catch (e) {
       throw Exception('Failed to get IMEI list: ${e.message}');

@@ -2,7 +2,11 @@
 
 A Flutter plugin to retrieve IMEI (International Mobile Equipment Identity) numbers from Android devices.
 
+## ⚠️ Important Limitations
+
 **Android Only**: This plugin only supports Android devices. iOS does not provide access to IMEI due to Apple's privacy policies.
+
+**Android 10+ Restriction**: IMEI access is heavily restricted on Android 10+ (API 29+) and only available to system apps. This plugin works on Android 5.0 - 9.0 only for regular apps. See [Android 10+ Restrictions](#️-android-10-restrictions) for details and alternatives.
 
 ## Platform Support
 
@@ -35,11 +39,19 @@ flutter pub get
 
 ## Android Setup
 
-Add the following permission to your `AndroidManifest.xml`:
+The plugin automatically includes the required permissions in its manifest.
+
+For reference, these permissions are:
 
 ```xml
+<!-- Required for Android 5.0-9.0 -->
 <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+
+<!-- Required for Android 10+ (only granted to system apps) -->
+<uses-permission android:name="android.permission.READ_PRIVILEGED_PHONE_STATE"/>
 ```
+
+**Note**: You don't need to manually add these to your app's `AndroidManifest.xml` - they're included in the plugin.
 
 ### Runtime Permission
 
@@ -102,9 +114,34 @@ See the [example](example/) directory for a complete sample app demonstrating ho
 
 ## Important Notes
 
+### ⚠️ Android 10+ Restrictions
+
+**CRITICAL**: Starting from Android 10 (API 29), Google has heavily restricted access to device identifiers including IMEI.
+
+**This plugin will NOT work on Android 10+ devices for regular apps.**
+
+IMEI access on Android 10+ is only available to apps with `READ_PRIVILEGED_PHONE_STATE` permission:
+- **System apps** (pre-installed on device with platform signature)
+- **Apps with carrier privileges**
+- **Default SMS apps**
+
+This plugin includes the `READ_PRIVILEGED_PHONE_STATE` permission declaration, but it will only be granted to system apps. Regular apps installed from Google Play Store or as APKs will receive a SecurityException.
+
+**Recommended Alternatives:**
+For device identification on Android 10+, consider using:
+- **Android ID**: `Settings.Secure.ANDROID_ID` (resets on factory reset)
+- **Firebase Installation ID**: Unique per app installation
+- **Advertising ID**: For advertising purposes only
+- **UUID**: Generate and store your own unique identifier
+
+### Supported Android Versions
+- **Android 5.0 - 9.0 (API 21-28)**: ✅ Full IMEI access with permission
+- **Android 10+ (API 29+)**: ❌ Restricted (system apps only)
+
 ### Android API Versions
-- **API 26+**: Uses `TelephonyManager.getImei()` and `TelephonyManager.getMeid()`
+- **API 26-28**: Uses `TelephonyManager.getImei()` and `TelephonyManager.getMeid()`
 - **API 21-25**: Uses deprecated `TelephonyManager.getDeviceId()`
+- **API 29+**: Throws SecurityException (Android 10+ restrictions)
 
 ### Privacy Considerations
 IMEI is a sensitive device identifier. Make sure to:

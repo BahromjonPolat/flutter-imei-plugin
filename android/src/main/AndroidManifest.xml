@@ -1,4 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="uz.mirrikhsoftware.imei">
     <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+    <!-- Privileged permission - only works for system apps -->
+    <uses-permission android:name="android.permission.READ_PRIVILEGED_PHONE_STATE"/>
 </manifest>

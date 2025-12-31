@@ -51,48 +51,108 @@ class ImeiPlugin: FlutterPlugin, MethodCallHandler {
   }
 
   private fun getImei(): String? {
-    if (ActivityCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE)
-        != PackageManager.PERMISSION_GRANTED) {
-      return null
+    // Check for READ_PRIVILEGED_PHONE_STATE (system apps) or READ_PHONE_STATE
+    val hasPrivilegedPermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+      ActivityCompat.checkSelfPermission(context, "android.permission.READ_PRIVILEGED_PHONE_STATE") == PackageManager.PERMISSION_GRANTED
+    } else {
+      false
+    }
+
+    val hasPhoneStatePermission = ActivityCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED
+
+    if (!hasPhoneStatePermission && !hasPrivilegedPermission) {
+      throw SecurityException("READ_PHONE_STATE or READ_PRIVILEGED_PHONE_STATE permission not granted")
     }
 
     val telephonyManager = context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
 
-    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-      telephonyManager.imei ?: telephonyManager.meid
-    } else {
-      @Suppress("DEPRECATION")
-      telephonyManager.deviceId
+    return try {
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        // Android 10+ requires READ_PRIVILEGED_PHONE_STATE for regular IMEI access
+        if (!hasPrivilegedPermission) {
+          throw SecurityException(
+            "IMEI access is restricted on Android 10+. " +
+            "Requires READ_PRIVILEGED_PHONE_STATE permission (system apps only). " +
+            "Regular apps should use Android ID or other alternatives."
+          )
+        }
+        // Try to get IMEI with privileged permission
+        telephonyManager.imei ?: telephonyManager.meid
+      } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        telephonyManager.imei ?: telephonyManager.meid
+      } else {
+        @Suppress("DEPRECATION")
+        telephonyManager.deviceId
+      }
+    } catch (e: SecurityException) {
+      throw e
+    } catch (e: Exception) {
+      throw SecurityException("Failed to get IMEI: ${e.message}")
     }
   }
 
   private fun getImeiList(): List<String> {
-    if (ActivityCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE)
-        != PackageManager.PERMISSION_GRANTED) {
-      return emptyList()
+    // Check for READ_PRIVILEGED_PHONE_STATE (system apps) or READ_PHONE_STATE
+    val hasPrivilegedPermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+      ActivityCompat.checkSelfPermission(context, "android.permission.READ_PRIVILEGED_PHONE_STATE") == PackageManager.PERMISSION_GRANTED
+    } else {
+      false
+    }
+
+    val hasPhoneStatePermission = ActivityCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED
+
+    if (!hasPhoneStatePermission && !hasPrivilegedPermission) {
+      throw SecurityException("READ_PHONE_STATE or READ_PRIVILEGED_PHONE_STATE permission not granted")
     }
 
     val telephonyManager = context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
     val imeiList = mutableListOf<String>()
 
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-      val phoneCount = telephonyManager.phoneCount
-      for (i in 0 until phoneCount) {
-        try {
-          val imei = telephonyManager.getImei(i)
-          if (imei != null) {
-            imeiList.add(imei)
+    try {
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        // Android 10+ requires READ_PRIVILEGED_PHONE_STATE for regular IMEI access
+        if (!hasPrivilegedPermission) {
+          throw SecurityException(
+            "IMEI access is restricted on Android 10+. " +
+            "Requires READ_PRIVILEGED_PHONE_STATE permission (system apps only). " +
+            "Regular apps should use Android ID or other alternatives."
+          )
+        }
+        // Try to get IMEI list with privileged permission
+        val phoneCount = telephonyManager.phoneCount
+        for (i in 0 until phoneCount) {
+          try {
+            val imei = telephonyManager.getImei(i)
+            if (imei != null) {
+              imeiList.add(imei)
+            }
+          } catch (e: Exception) {
+            // Ignore if slot is empty or access denied
           }
-        } catch (e: Exception) {
-          // Ignore if slot is empty
+        }
+      } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        val phoneCount = telephonyManager.phoneCount
+        for (i in 0 until phoneCount) {
+          try {
+            val imei = telephonyManager.getImei(i)
+            if (imei != null) {
+              imeiList.add(imei)
+            }
+          } catch (e: Exception) {
+            // Ignore if slot is empty or access denied
+          }
+        }
+      } else {
+        @Suppress("DEPRECATION")
+        val deviceId = telephonyManager.deviceId
+        if (deviceId != null) {
+          imeiList.add(deviceId)
         }
       }
-    } else {
-      @Suppress("DEPRECATION")
-      val deviceId = telephonyManager.deviceId
-      if (deviceId != null) {
-        imeiList.add(deviceId)
-      }
+    } catch (e: SecurityException) {
+      throw e
+    } catch (e: Exception) {
+      throw SecurityException("Failed to get IMEI list: ${e.message}")
     }
 
     return imeiList
