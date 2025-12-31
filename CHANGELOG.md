@@ -1,3 +1,17 @@
+## 0.1.0
+
+* Added READ_PRIVILEGED_PHONE_STATE permission for Android 10+ system apps
+* Enhanced error messages with clear instructions for different scenarios
+* Updated documentation with detailed Android 10+ restrictions and alternatives
+* Improved permission handling for both regular and privileged permissions
+* Added support for system apps on Android 10+ (with platform signature)
+
+**Breaking Changes**: None
+
+**Android 10+ Support**:
+- System apps (with READ_PRIVILEGED_PHONE_STATE): ✅ Full IMEI access
+- Regular apps: ❌ SecurityException (use Android ID instead)
+
 ## 0.0.1
 
 * Initial release - Android only

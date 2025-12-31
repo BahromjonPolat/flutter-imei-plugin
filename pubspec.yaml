@@ -1,6 +1,6 @@
 name: imei
 description: Plugin package to get device imei
-version: 0.0.1
+version: 0.1.0
 homepage: https://github.com/BahromjonPolat/flutter-imei-plugin
 repository: https://github.com/BahromjonPolat/flutter-imei-plugin
 
