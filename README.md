@@ -2,12 +2,14 @@
 
 A Flutter plugin to retrieve IMEI (International Mobile Equipment Identity) numbers from Android devices.
 
+**Android Only**: This plugin only supports Android devices. iOS does not provide access to IMEI due to Apple's privacy policies.
+
 ## Platform Support
 
 | Platform | Supported | Notes |
 |----------|-----------|-------|
-| Android  | Yes       | Requires READ_PHONE_STATE permission |
-| iOS      | No        | Apple removed IMEI access for privacy reasons |
+| Android  | ✅ Yes    | Requires READ_PHONE_STATE permission |
+| iOS      | ❌ No     | Not supported (Apple privacy policy) |
 
 ## Features
 
@@ -99,15 +101,6 @@ try {
 See the [example](example/) directory for a complete sample app demonstrating how to use this plugin.
 
 ## Important Notes
-
-### iOS Support
-iOS does not support IMEI retrieval. Apple removed access to device identifiers like IMEI and UDID for privacy reasons. On iOS:
-- `getImei()` will throw a PlatformException
-- `getImeiList()` will return an empty list
-
-If you need to identify iOS devices, consider using:
-- `identifierForVendor` (changes when app is reinstalled)
-- Device check API for fraud prevention
 
 ### Android API Versions
 - **API 26+**: Uses `TelephonyManager.getImei()` and `TelephonyManager.getMeid()`

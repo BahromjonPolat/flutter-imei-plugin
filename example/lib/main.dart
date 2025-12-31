@@ -252,22 +252,22 @@ class _MyHomePageState extends State<MyHomePage> {
                   children: [
                     Row(
                       children: [
-                        Icon(Icons.warning, color: Colors.orange),
+                        Icon(Icons.android, color: Colors.green),
                         SizedBox(width: 8),
                         Text(
-                          'Note',
+                          'Android Only',
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            color: Colors.orange,
+                            color: Colors.green,
                           ),
                         ),
                       ],
                     ),
                     SizedBox(height: 8),
                     Text(
-                      'IMEI is only available on Android devices. '
-                      'iOS does not provide access to IMEI for privacy reasons.',
+                      'This plugin only works on Android devices. '
+                      'IMEI access is not available on iOS due to Apple\'s privacy policies.',
                     ),
                   ],
                 ),

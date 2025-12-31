@@ -22,5 +22,3 @@ flutter:
       android:
         package: uz.mirrikhsoftware.imei
         pluginClass: ImeiPlugin
-      ios:
-        pluginClass: ImeiPlugin

@@ -7,9 +7,7 @@ class Imei {
 
   /// Get the IMEI number of the device.
   ///
-  /// Returns the IMEI number as a String on Android.
-  /// On iOS, this will throw a [PlatformException] since Apple doesn't allow
-  /// access to IMEI for privacy reasons.
+  /// **Android Only**: Returns the IMEI number as a String.
   ///
   /// Requires READ_PHONE_STATE permission on Android.
   ///
@@ -25,9 +23,7 @@ class Imei {
 
   /// Get list of all IMEI numbers (for dual SIM devices).
   ///
-  /// Returns a list of IMEI numbers on Android.
-  /// On iOS, this will return an empty list since Apple doesn't allow
-  /// access to IMEI for privacy reasons.
+  /// **Android Only**: Returns a list of IMEI numbers.
   ///
   /// Requires READ_PHONE_STATE permission on Android.
   ///
